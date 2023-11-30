@@ -1,32 +1,35 @@
 CORRECION_LLENADO = """
 SELECT
-    fecha_hora,
-    NOMBRE_COMPLETO,
-    ID,
-    CELULAR,
-    EMAIL,
-    PAIS,
-    INVITADO_POR,
-    ID_TWOGETHER,
-    ROW_NUMBER() OVER (PARTITION BY ID, ID_TWOGETHER ORDER BY fecha_hora) AS LLENADO_INCORRECTO,
-    ROW_NUMBER() OVER (PARTITION BY ID ORDER BY fecha_hora) AS USUARIOS_ENIDTWOGETHER
-FROM frame
+    fechaRegistro,
+    nombreCompleto,
+    numeroDocumento,
+    numeroContacto,
+    correoElectronico,
+    fechaNacimiento,
+    paisResidencia,
+    nombreReferidor,
+    idReferidor,
+    pasosCumplidos,
+    ROW_NUMBER() OVER (PARTITION BY numeroDocumento, idReferidor ORDER BY fechaRegistro desc) AS LLENADO_INCORRECTO,
+    ROW_NUMBER() OVER (PARTITION BY numeroDocumento ORDER BY fechaRegistro) AS USUARIOS_ENIDTWOGETHER
+FROM allframe
 """
 
 CONTACTOS = """
 
 WITH USUARIOS_VALIDOS AS (
     SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY ID_TWOGETHER ORDER BY fecha_hora) AS CANTIDAD_CONMISMOID
+        ROW_NUMBER() OVER (PARTITION BY idReferidor ORDER BY fechaRegistro) AS CANTIDAD_CONMISMOID
     FROM frame_corregido
     WHERE LLENADO_INCORRECTO = 1
 )
 
 SELECT 
-    fecha_hora,
-    ID,
-    ID_TWOGETHER,
-    PAIS,
+    fechaRegistro,
+    numeroDocumento,
+    nombreReferidor
+    idReferidor,
+    paisResidencia,
     LLENADO_INCORRECTO,
     USUARIOS_ENIDTWOGETHER,
     CANTIDAD_CONMISMOID,
@@ -34,10 +37,9 @@ SELECT
         ELSE 'NO_CONTACTAR' END AS VALIDACION_LLENADO,
     CASE WHEN CANTIDAD_CONMISMOID > 2 THEN 'CONTACTAR_USUARIO_ENID_CON+2_PERSONAS'
         ELSE 'NO_CONTACTAR' END AS VALIDACION_IDTWOGETHER,
-    NOMBRE_COMPLETO,
-    CELULAR,
-    EMAIL,
-    INVITADO_POR
+    nombreCompleto,
+    numeroContacto,
+    correoElectronico
 FROM USUARIOS_VALIDOS
-ORDER BY ID, ID_TWOGETHER;
+ORDER BY numeroDocumento, idReferidor;
 """

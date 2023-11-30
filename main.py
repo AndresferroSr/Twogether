@@ -3,9 +3,9 @@ import json
 import query
 import gspread
 import requests
-
 import pandas as pd
 
+from datetime import datetime
 from pydantic import BaseModel, constr, EmailStr, StrictBool
 from pandasql import sqldf
 
@@ -47,12 +47,9 @@ def read_bad_excel(path):
     return df
 
 
-@app.route('/api/data', methods=['GET'])
+@app.route('/api/data', methods=['POST'])
 def get_data():
-    frame = read_bad_excel(FILE)
-    frame_corregido = sqldf(query.CORRECION_LLENADO)
-    frame_contactos = sqldf(query.CONTACTOS)
-    json_data = frame_contactos.to_json(orient='records', default_handler = str)
+
     return jsonify({'data': json_data})
 
 
@@ -87,13 +84,32 @@ def front():
     if request.method == "POST":
         try:
             dict_form = request.form.to_dict()
+
             datos_formulario = DatosFormulario(**dict_form)
             frame = pd.DataFrame(dict_form, index=[0])
-            
-            frame.to_gbq(destination_table = f'{settings.DATASET}.pt_clientes_celular',
+            frame['fechaRegistro'] = pd.to_datetime(datetime.now())
+
+            frame.to_gbq(destination_table = f'{settings.DATASET}.form_web_llenado',
                                 project_id = settings.PROJECT_ID,
                                 credentials = settings.credentials,
                                 if_exists = "append")
+
+            allframe = settings.client.query("select * from web_page.form_web_llenado").to_dataframe()
+            frame_corregido = sqldf(query.CORRECION_LLENADO)
+            frame_contactos = sqldf(query.CONTACTOS)
+            frame_contactos["fechaRegistro"] = pd.to_datetime(frame_contactos["fechaRegistro"])
+            
+            filtro = (
+                #(frame_contactos['fechaRegistro'] == frame['fechaRegistro'].iloc[0]) &
+                (frame_contactos['numeroDocumento'] == frame['numeroDocumento'].iloc[0]) &
+                (frame_contactos['idReferidor'] == frame['idReferidor'].iloc[0])
+            )
+
+            # Aplicar el filtro al DataFrame `frame_contactos`
+            frame_contactos_filtrado = frame_contactos[filtro]
+
+            breakpoint()
+
 
 
             return jsonify({'status': 'success', 
@@ -103,6 +119,10 @@ def front():
             return jsonify({'status': 'error', 'message': 
                             f'Error en los datos del formulario: {str(e)}'})
     return render_template('index.html')
+
+
+
+
 
 # Ejecutar la aplicación Flask
 if __name__ == '__main__':
