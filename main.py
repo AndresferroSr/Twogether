@@ -5,9 +5,13 @@ import gspread
 import requests
 
 import pandas as pd
+
+from pydantic import BaseModel, constr, EmailStr, StrictBool
 from pandasql import sqldf
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
+
+import settings 
 
 app = Flask(__name__)
 
@@ -66,6 +70,39 @@ def hook_data():
         print({'status': response.status_code, 'message': response.text})
     return jsonify({'status': response.status_code,
                     'message': response.text})
+
+
+class DatosFormulario(BaseModel):
+    nombreCompleto: constr(strip_whitespace=True, min_length=1)
+    paisResidencia: constr(strip_whitespace=True, min_length=1)
+    numeroDocumento: constr(strip_whitespace=True, min_length=1)
+    numeroContacto: constr(strip_whitespace=True, min_length=1)
+    correoElectronico: EmailStr
+    fechaNacimiento: str
+    nombreReferidor: constr(strip_whitespace=True, min_length=1)
+    idReferidor: constr(strip_whitespace=True, min_length=1)
+
+@app.route('/front', methods = ["GET", "POST"])
+def front():
+    if request.method == "POST":
+        try:
+            dict_form = request.form.to_dict()
+            datos_formulario = DatosFormulario(**dict_form)
+            frame = pd.DataFrame(dict_form, index=[0])
+            
+            frame.to_gbq(destination_table = f'{settings.DATASET}.pt_clientes_celular',
+                                project_id = settings.PROJECT_ID,
+                                credentials = settings.credentials,
+                                if_exists = "append")
+
+
+            return jsonify({'status': 'success', 
+                            'code': 200,
+                            'message': 'Formulario recibido correctamente'})
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': 
+                            f'Error en los datos del formulario: {str(e)}'})
+    return render_template('index.html')
 
 # Ejecutar la aplicación Flask
 if __name__ == '__main__':

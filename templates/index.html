@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Your Page Title</title>
+    <!-- Add any additional stylesheets or scripts here -->
+</head>
+
+<style>
+    body {
+        background: linear-gradient(0deg, #f6eadb 35%, rgba(0, 0, 0, 0) 100%, #f6eadb 100%);
+    }
+</style>
+<style>
+    /* Agrega estilos personalizados aquí */
+    .accordion {
+      background-color: #001f3f; /* Azul oscuro */
+      color: #ffffff; /* Texto en color blanco */
+    }
+
+    .accordion-button {
+      background-color: #003366; /* Azul oscuro más claro */
+    }
+
+    .accordion-button:hover {
+      background-color: #001a2e; /* Cambia de color al pasar el ratón */
+    }
+  </style>
+
+<body>
+
+    <div class="container d-flex flex-column align-items-center justify-content-center">
+        <div class="row">
+            <img decoding="async" fetchpriority="high" width="768" height="209" src="https://comunidadtwogether.com/wp-content/uploads/2023/11/TG-1-_1_-768x209.webp" class="img-fluid" alt="" srcset="https://comunidadtwogether.com/wp-content/uploads/2023/11/TG-1-_1_-768x209.webp 768w, https://comunidadtwogether.com/wp-content/uploads/2023/11/TG-1-_1_-300x82.webp 300w, https://comunidadtwogether.com/wp-content/uploads/2023/11/TG-1-_1_-1024x279.webp 1024w, https://comunidadtwogether.com/wp-content/uploads/2023/11/TG-1-_1_-1536x419.webp 1536w, https://comunidadtwogether.com/wp-content/uploads/2023/11/TG-1-_1_-2048x559.webp 2048w" sizes="(max-width: 768px) 100vw, 768px" />
+        </div>
+        <div class="row mt-3">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        </div>
+
+
+        <div class="accordion" id="preguntasAcordeon">
+            <!-- Pregunta 1 -->
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="pregunta1Header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pregunta1" aria-expanded="false" aria-controls="pregunta1">
+                  PREGUNTA 1: ¿Ser parte de la Comunidad Twogether y de la Plataforma Global E-commerce tiene algún costo?
+                </button>
+              </h2>
+              <div id="pregunta1" class="accordion-collapse collapse" aria-labelledby="pregunta1Header" data-bs-parent="#preguntasAcordeon">
+                <div class="accordion-body">
+                  Contenido de la respuesta a la PREGUNTA 1.
+                </div>
+              </div>
+            </div>
+        
+            <!-- Puedes copiar y pegar bloques similares para cada pregunta -->
+        
+            <!-- Pregunta 2 -->
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="pregunta2Header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pregunta2" aria-expanded="false" aria-controls="pregunta2">
+                  PREGUNTA 2: ¿Cómo la Comunidad Twogether logra los resultados financieros?
+                </button>
+              </h2>
+              <div id="pregunta2" class="accordion-collapse collapse" aria-labelledby="pregunta2Header" data-bs-parent="#preguntasAcordeon">
+                <div class="accordion-body">
+                  Contenido de la respuesta a la PREGUNTA 2.
+                </div>
+              </div>
+            </div>
+            
+            <!-- Repite el mismo patrón para las demás preguntas -->
+        
+        </div>
+
+
+        <form class="my-5" method="POST">
+          <div class="mb-3">
+              <label for="nombreCompleto" class="form-label">✅ Nombre completo:</label>
+              <input type="text" class="form-control" id="nombreCompleto" name="nombreCompleto" placeholder="Nombres y apellidos">
+          </div>
+          <div class="mb-3">
+              <label for="paisResidencia" class="form-label">✅ País de residencia:</label>
+              <select class="form-select" id="paisResidencia" name="paisResidencia">
+                  <option value="CO">Colombia</option>
+                  <option value="EEUU">EEUU</option>
+                  <option value="Peru">Perú</option>
+                  <option value="Chile">Chile</option>
+                  <option value="Europa">Europa</option>
+                  <option value="Ecuador">Ecuador</option>
+                  <option value="Mexico">México</option>
+                  <!-- Puedes agregar más opciones de países según sea necesario -->
+              </select>
+          </div>
+          <div class="mb-3">
+              <label for="numeroDocumento" class="form-label">✅ Número del Documento de Identificación:</label>
+              <input type="text" class="form-control" id="numeroDocumento" name="numeroDocumento" placeholder="Cédula, DNI, ID, driver licence">
+          </div>
+          <div class="mb-3">
+              <label for="numeroContacto" class="form-label">✅ Número contacto:</label>
+              <input type="text" class="form-control" id="numeroContacto" name="numeroContacto" placeholder="Sin indicativo de país, preferiblemente con WhatsApp">
+          </div>
+          <div class="mb-3">
+              <label for="correoElectronico" class="form-label">✅ Correo electrónico:</label>
+              <input type="email" class="form-control" id="correoElectronico" name="correoElectronico" placeholder="Personal o empresarial">
+          </div>
+          <div class="mb-3">
+              <label for="fechaNacimiento" class="form-label">✅ Fecha de nacimiento:</label>
+              <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento">
+          </div>
+          <div class="mb-3">
+              <label for="nombreInvitador" class="form-label">✅ Nombre completo de la persona que te invitó:</label>
+              <input type="text" class="form-control" id="nombreInvitador" name="nombreReferidor" placeholder="Nombres y apellidos">
+          </div>
+          <div class="mb-3">
+              <label for="idInvitador" class="form-label">✅ Escribe el ID Twogether de quien te invitó:</label>
+              <input type="text" class="form-control" id="idInvitador" name="idReferidor" placeholder="Recuerda revisar el mensaje de invitación">
+          </div>
+          <div class="form-check mb-3">
+              <input type="checkbox" class="form-check-input" id="pasosCumplidos" name="pasosCumplidos">
+              <label class="form-check-label" for="pasosCumplidos">He cumplido los pasos descritos anteriormente.</label>
+          </div>
+          <button type="submit" class="btn btn-primary form-control" id="enviar">Enviar</button>
+      </form>
+      
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Add any additional scripts here -->
+
+<script>
+     const button =  document.querySelector('#enviar');
+     
+     button.addEventListener('click', function() {
+    // Agrega aquí el código que deseas ejecutar cuando se hace clic en el botón "Enviar"
+    alert('Aca ya estoy controlando el formulario');
+  });
+</script>
+
+</body>
+</html>
