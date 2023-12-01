@@ -27,16 +27,11 @@ WITH USUARIOS_VALIDOS AS (
 SELECT 
     fechaRegistro,
     numeroDocumento,
-    nombreReferidor
+    nombreReferidor,
     idReferidor,
     paisResidencia,
-    LLENADO_INCORRECTO,
-    USUARIOS_ENIDTWOGETHER,
-    CANTIDAD_CONMISMOID,
-    CASE WHEN USUARIOS_ENIDTWOGETHER > 1 THEN 'CONTACTAR_USUARIO_EN_+2ID_TWOGETHER'
-        ELSE 'NO_CONTACTAR' END AS VALIDACION_LLENADO,
-    CASE WHEN CANTIDAD_CONMISMOID > 2 THEN 'CONTACTAR_USUARIO_ENID_CON+2_PERSONAS'
-        ELSE 'NO_CONTACTAR' END AS VALIDACION_IDTWOGETHER,
+    USUARIOS_ENIDTWOGETHER as registroConMismoId,
+    CANTIDAD_CONMISMOID as referidosPorReferidor,
     nombreCompleto,
     numeroContacto,
     correoElectronico

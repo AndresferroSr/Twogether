@@ -1,9 +1,9 @@
 import os
-import json
 import query
-import gspread
+#import gspread
 import requests
 import pandas as pd
+import validators
 
 from datetime import datetime
 from pydantic import BaseModel, constr, EmailStr, StrictBool
@@ -45,12 +45,6 @@ def read_bad_excel(path):
         df['hora_convertida'].astype(str)
     )
     return df
-
-
-@app.route('/api/data', methods=['POST'])
-def get_data():
-
-    return jsonify({'data': json_data})
 
 
 @app.route('/hook', methods=['GET'])
@@ -100,28 +94,26 @@ def front():
             frame_contactos["fechaRegistro"] = pd.to_datetime(frame_contactos["fechaRegistro"])
             
             filtro = (
-                #(frame_contactos['fechaRegistro'] == frame['fechaRegistro'].iloc[0]) &
-                (frame_contactos['numeroDocumento'] == frame['numeroDocumento'].iloc[0]) &
-                (frame_contactos['idReferidor'] == frame['idReferidor'].iloc[0])
+                (frame_contactos['fechaRegistro'] == frame['fechaRegistro'].iloc[0]) &
+                (frame_contactos['numeroDocumento'] == frame['numeroDocumento'].iloc[0])# &
             )
-
-            # Aplicar el filtro al DataFrame `frame_contactos`
+            
             frame_contactos_filtrado = frame_contactos[filtro]
 
-            breakpoint()
+            frame_contactos_filtrado['primerNombre'] = frame_contactos_filtrado['nombreCompleto'].apply(validators.obtener_primer_nombre)
+            frame_contactos_filtrado_serial = validators.correct_frame(frame_contactos_filtrado)
+            frame_contactos_filtrado_serial
 
-
+            requests.post('https://hook.us1.make.com/di6tg4ufk8hx9s2tc977tlj7pinsua38', json = frame_contactos_filtrado_serial.to_dict(orient = "records"))
 
             return jsonify({'status': 'success', 
                             'code': 200,
+                            'user': validators.correct_frame(frame_contactos_filtrado).to_dict(orient = "records"),
                             'message': 'Formulario recibido correctamente'})
         except Exception as e:
             return jsonify({'status': 'error', 'message': 
                             f'Error en los datos del formulario: {str(e)}'})
     return render_template('index.html')
-
-
-
 
 
 # Ejecutar la aplicación Flask
