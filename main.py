@@ -1,5 +1,6 @@
 import os
 import query
+import json
 #import gspread
 import requests
 import pandas as pd
@@ -73,11 +74,41 @@ class DatosFormulario(BaseModel):
     nombreReferidor: constr(strip_whitespace=True, min_length=1)
     idReferidor: constr(strip_whitespace=True, min_length=1)
 
+def calcular_edad(fecha_nacimiento):
+    # Convertir la cadena de fecha a un objeto datetime
+    fecha_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d')
+    fecha_actual = datetime.now()
+    edad = fecha_actual.year - fecha_nacimiento.year - ((fecha_actual.month, fecha_actual.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
+    if edad < 18:
+        raise ValueError("La persona es menor de edad.")
+    return edad
+
+@app.route('/getuser', methods = ["GET", "POST"])
+def get_user():
+    user_id = request.args.get('userID')
+    frame_result = settings.client.query(f"select nombreReferidor, idReferidor from web_page.form_web_llenado WHERE idReferidor = '{user_id}'").to_dataframe()
+
+    if frame_result.shape[0] >= 1:
+        print(frame_result.shape[0])
+        return jsonify({'status': 'success', 
+                                'code': 200,
+                                'user': frame_result.tail(1).to_dict(orient = "records"),
+                                'message': 'Formulario recibido correctamente'})
+    return jsonify({'status': 'error', 
+                    'code': 400,
+                    'message': 'Usuario no encontrado en la base de datos'})
+        
+
+
 @app.route('/front', methods = ["GET", "POST"])
 def front():
     if request.method == "POST":
         try:
-            dict_form = request.form.to_dict()
+            # dict_form = request.form.to_dict()
+            dict_form = json.loads(request.data)
+            dict_form["pasosCumplidos"] = str(dict_form["pasosCumplidos"])
+
+            calcular_edad(dict_form["fechaNacimiento"])
 
             datos_formulario = DatosFormulario(**dict_form)
             frame = pd.DataFrame(dict_form, index=[0])
@@ -112,7 +143,8 @@ def front():
                             'message': 'Formulario recibido correctamente'})
         except Exception as e:
             return jsonify({'status': 'error', 'message': 
-                            f'Error en los datos del formulario: {str(e)}'})
+                            f'Error en los datos del formulario: {str(e)}',
+                            'code': 400})
     return render_template('index.html')
 
 
