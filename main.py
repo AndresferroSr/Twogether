@@ -86,7 +86,7 @@ def calcular_edad(fecha_nacimiento):
 @app.route('/getuser', methods = ["GET", "POST"])
 def get_user():
     user_id = request.args.get('userID')
-    frame_result = settings.client.query(f"select nombreReferidor, idReferidor from web_page.form_web_llenado WHERE idReferidor = '{user_id}'").to_dataframe()
+    frame_result = settings.client.query(f"select nombreCompleto, numeroDocumento from web_page.form_web_llenado WHERE numeroDocumento = '{user_id}'").to_dataframe()
 
     if frame_result.shape[0] >= 1:
         print(frame_result.shape[0])
