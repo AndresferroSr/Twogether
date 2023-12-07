@@ -74,6 +74,15 @@ class DatosFormulario(BaseModel):
     nombreReferidor: constr(strip_whitespace=True, min_length=1)
     idReferidor: constr(strip_whitespace=True, min_length=1)
 
+def transform_phone_number(phone_number, country):
+    # Obtener el código de país
+    country_code = query.COUNTRIES.get(country, '')
+    # Verificar si el número ya tiene el código de país
+    if phone_number.startswith(country_code):
+        return phone_number
+    else:
+        return f'{country_code}{phone_number}'
+
 def calcular_edad(fecha_nacimiento):
     # Convertir la cadena de fecha a un objeto datetime
     fecha_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d')
@@ -107,7 +116,8 @@ def front():
             # dict_form = request.form.to_dict()
             dict_form = json.loads(request.data)
             dict_form["pasosCumplidos"] = str(dict_form["pasosCumplidos"])
-
+            dict_form['numeroContacto'] = transform_phone_number(dict_form['numeroContacto'], dict_form['paisResidencia'])
+            
             calcular_edad(dict_form["fechaNacimiento"])
 
             datos_formulario = DatosFormulario(**dict_form)

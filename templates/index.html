@@ -237,7 +237,6 @@
                   <option value="EEUU">EEUU</option>
                   <option value="Peru">Perú</option>
                   <option value="Chile">Chile</option>
-                  <option value="Europa">Europa</option>
                   <option value="Ecuador">Ecuador</option>
                   <option value="Mexico">México</option>
                   <!-- Puedes agregar más opciones de países según sea necesario -->
@@ -397,7 +396,7 @@
         console.log(data)
         if (data.code == 200) {
             registro.innerHTML = `<p> 
-                                      Usuario Referidor Encontrado: <span class="fw-bolder"> ${data.user[0].nombreReferidor} </span>
+                                      Usuario Referidor Encontrado: <span class="fw-bolder"> ${data.user[0].nombreCompleto} </span>
                                   </p>
                                   <br>
                                   <button type="button" class="btn btn-warning form-control" data-bs-dismiss="modal">Registarme</button>`;
