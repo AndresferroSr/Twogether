@@ -142,10 +142,26 @@ def front():
             frame_contactos_filtrado = frame_contactos[filtro]
 
             frame_contactos_filtrado['primerNombre'] = frame_contactos_filtrado['nombreCompleto'].apply(validators.obtener_primer_nombre)
-            frame_contactos_filtrado_serial = validators.correct_frame(frame_contactos_filtrado)
-            frame_contactos_filtrado_serial
+            frame_contactos_filtrado_serial = validators.correct_frame(frame_contactos_filtrado).to_dict(orient = "records")
+            frame_contactos_filtrado_serial_valid = frame_contactos_filtrado_serial[0]
+            
+            if int(frame_contactos_filtrado_serial_valid.get("referidosPorReferidor")) > 2:
+                settings.client.query(f"delete from web_page.form_web_llenado WHERE numeroDocumento = '{frame_contactos_filtrado_serial_valid.get('numeroDocumento')}'")
 
-            requests.post('https://hook.us1.make.com/di6tg4ufk8hx9s2tc977tlj7pinsua38', json = frame_contactos_filtrado_serial.to_dict(orient = "records"))
+            if int(frame_contactos_filtrado_serial_valid.get("registroConMismoId")) > 1:
+                frame = settings.client.query(f"""SELECT numeroDocumento, fechaRegistro,
+                            row_number() over(partition by numeroDocumento order by fechaRegistro asc) as rown
+                            FROM towgether.web_page.form_web_llenado
+                            where numeroDocumento = '{frame_contactos_filtrado_serial_valid.get('numeroDocumento')}'
+                            qualify rown = 2
+                            """).to_dataframe()
+                deletes = frame.to_dict(orient = "records")[0]
+                settings.client.query(f"""delete 
+                            FROM `towgether.web_page.form_web_llenado` 
+                            where numeroDocumento = '{deletes['numeroDocumento']}'
+                            and fechaRegistro = '{deletes['fechaRegistro']}'
+                """)
+            requests.post('https://hook.us1.make.com/di6tg4ufk8hx9s2tc977tlj7pinsua38', json = frame_contactos_filtrado_serial)
 
             return jsonify({'status': 'success', 
                             'code': 200,
