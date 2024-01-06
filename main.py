@@ -145,22 +145,27 @@ def front():
             frame_contactos_filtrado_serial = validators.correct_frame(frame_contactos_filtrado).to_dict(orient = "records")
             frame_contactos_filtrado_serial_valid = frame_contactos_filtrado_serial[0]
             
-            if int(frame_contactos_filtrado_serial_valid.get("referidosPorReferidor")) > 2:
-                settings.client.query(f"delete from web_page.form_web_llenado WHERE numeroDocumento = '{frame_contactos_filtrado_serial_valid.get('numeroDocumento')}'")
+            if frame_contactos_filtrado_serial_valid.get('numeroDocumento').startswith("LC"):
+                frame_contactos_filtrado_serial["referidosPorReferidor"] = 0
+                frame_contactos_filtrado_serial["registroConMismoId"] = 0
+                pass # como es lider de comunidad, no deben correr las validaciones
+            else:
+                if int(frame_contactos_filtrado_serial_valid.get("referidosPorReferidor")) > 2:
+                    settings.client.query(f"delete from web_page.form_web_llenado WHERE numeroDocumento = '{frame_contactos_filtrado_serial_valid.get('numeroDocumento')}'")
 
-            if int(frame_contactos_filtrado_serial_valid.get("registroConMismoId")) > 1:
-                frame = settings.client.query(f"""SELECT numeroDocumento, fechaRegistro,
-                            row_number() over(partition by numeroDocumento order by fechaRegistro asc) as rown
-                            FROM towgether.web_page.form_web_llenado
-                            where numeroDocumento = '{frame_contactos_filtrado_serial_valid.get('numeroDocumento')}'
-                            qualify rown = 2
-                            """).to_dataframe()
-                deletes = frame.to_dict(orient = "records")[0]
-                settings.client.query(f"""delete 
-                            FROM `towgether.web_page.form_web_llenado` 
-                            where numeroDocumento = '{deletes['numeroDocumento']}'
-                            and fechaRegistro = '{deletes['fechaRegistro']}'
-                """)
+                if int(frame_contactos_filtrado_serial_valid.get("registroConMismoId")) > 1:
+                    frame = settings.client.query(f"""SELECT numeroDocumento, fechaRegistro,
+                                row_number() over(partition by numeroDocumento order by fechaRegistro asc) as rown
+                                FROM towgether.web_page.form_web_llenado
+                                where numeroDocumento = '{frame_contactos_filtrado_serial_valid.get('numeroDocumento')}'
+                                qualify rown = 2
+                                """).to_dataframe()
+                    deletes = frame.to_dict(orient = "records")[0]
+                    settings.client.query(f"""delete 
+                                FROM `towgether.web_page.form_web_llenado` 
+                                where numeroDocumento = '{deletes['numeroDocumento']}'
+                                and fechaRegistro = '{deletes['fechaRegistro']}'
+                    """)
             requests.post('https://hook.us1.make.com/di6tg4ufk8hx9s2tc977tlj7pinsua38', json = frame_contactos_filtrado_serial)
 
             return jsonify({'status': 'success', 

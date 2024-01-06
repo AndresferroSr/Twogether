@@ -16,7 +16,7 @@
         <form class="my-3 form-control text-light" method="POST" id="formEnvio" style="background-color: #2E318E;">
           <div class="mb-3">
               <label for="nombreCompleto" class="form-label">✅ Nombre completo:</label>
-              <input type="text" class="form-control" id="nombreCompleto" name="nombreCompleto" placeholder="Nombres y apellidos" required>
+              <input type="text" class="form-control" id="nombreCompleto" name="nombreCompleto" placeholder="Nombres y apellidos por favor" required>
           </div>
           <div class="mb-3">
               <label for="paisResidencia" class="form-label">✅ País de residencia:</label>
@@ -51,17 +51,28 @@
               <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento" required>
           </div>
           <div class="mb-3">
-              <label for="nombreReferidor" class="form-label">✅ Nombre completo de la persona que te invitó:</label>
-              <input type="text" class="form-control" id="nombreReferidor" name="nombreReferidor" placeholder="Nombres y apellidos" required>
-          </div>
-          <div class="mb-3">
               <label for="idReferidor" class="form-label">✅ Escribe el ID Twogether de quien te invitó:</label>
               <input type="text" class="form-control" id="idReferidor" name="idReferidor" placeholder="Recuerda revisar el mensaje de invitación" required>
           </div>
-          <div class="form-check mb-3">
-              <input type="checkbox" class="form-check-input" id="pasosCumplidos" name="pasosCumplidos" required>
-              <label class="form-check-label" for="pasosCumplidos">He cumplido los pasos descritos anteriormente.</label>
+          <div>
+            <p>FELICITACIONES, Si has llegado hasta este punto es por que has tomado la decisión de ganar dinero por tus compras, marca las casillas recordando los pasos que vas a cumplir: </p>
           </div>
+          <div class="form-check mb-3">
+              <input type="checkbox" class="form-check-input" id="pasosCumplidos1" name="pasosCumplidos" required>
+              <label class="form-check-label" for="pasosCumplidos"> Paso 1: Me registro en la Comunidad Twogether.</label>
+          </div>
+          <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="pasosCumplidos2" name="pasosCumplidos" required>
+            <label class="form-check-label" for="pasosCumplidos">Paso 2: Envío el link de invitación con el propósito de beneficiar a 2 personas a la comunidad, meta que debo lograr como máximo en 2 días.</label>
+        </div>
+        <div class="form-check mb-3">
+          <input type="checkbox" class="form-check-input" id="pasosCumplidos3" name="pasosCumplidos" required>
+          <label class="form-check-label" for="pasosCumplidos">Paso 3: Realizo mi compra el dia asignado (Sustituyo productos que ya consumo por un valor aproximado de $200 USD o 100.000 puntos)</label>
+      </div>
+      <div class="form-check mb-3">
+        <input type="checkbox" class="form-check-input" id="pasosCumplidos4" name="pasosCumplidos" required>
+        <label class="form-check-label" for="pasosCumplidos">Paso 4: Recibo ganancias de la Plataforma Global E-Commerce.</label>
+    </div>
           <button type="button" class="btn btn-warning form-control" id="enviar" style="background-color: #F18F15;">Quiero ser parte de la comunidad Twogether</button>
           
            <!-- Modal -->
@@ -99,7 +110,6 @@
   const loadingModal = new bootstrap.Modal(document.getElementById('exampleModal'));
 
   enviar.addEventListener("click", () => {
-    
     const registro = document.querySelector("#registro");
     const idReferidor = document.querySelector("#idReferidor").value;
     const textInput = document.querySelector("#text-input");
@@ -113,8 +123,11 @@
     const numeroContacto = document.getElementById('numeroContacto').value;
     const correoElectronico = document.getElementById('correoElectronico').value;
     const fechaNacimiento = document.getElementById('fechaNacimiento').value;
-    const nombreReferidor = document.getElementById('nombreReferidor').value;
-    const pasosCumplidos = document.getElementById('pasosCumplidos').checked;
+    //const nombreReferidor = document.getElementById('nombreReferidor').value;
+    const pasosCumplidos1 = document.getElementById('pasosCumplidos1').checked;
+    const pasosCumplidos2 = document.getElementById('pasosCumplidos2').checked;
+    const pasosCumplidos3 = document.getElementById('pasosCumplidos3').checked;
+    const pasosCumplidos4 = document.getElementById('pasosCumplidos4').checked;
     const spinner = document.querySelector("#spinner");
     
      // Validar que todos los campos estén llenos
@@ -125,9 +138,12 @@
         !numeroContacto ||
         !correoElectronico ||
         !fechaNacimiento ||
-        !nombreReferidor ||
+        //!nombreReferidor ||
         !idReferidor ||
-        !pasosCumplidos
+        !pasosCumplidos1 || 
+        !pasosCumplidos2 || 
+        !pasosCumplidos3 || 
+        !pasosCumplidos4 
     ) {
         // Al menos un campo está vacío, mostrar un mensaje de error o realizar otras acciones según sea necesario
         Swal.fire({
@@ -180,7 +196,6 @@
 
   });
 
-     
 
 </script>
 
@@ -227,8 +242,8 @@
                 })
                 .then(data => {
                   if (data.code == 200) {
-                    window.open('https://comunidadtwogether.com/registrotwogether/', '_blank');
-                  } else {
+                    window.top.location.href = 'https://comunidadtwogether.com/registrotwogether/';
+                      } else {
                       loadingModal.hide();
                         Swal.fire({
                         icon: "error",
