@@ -105,7 +105,32 @@
 <!-- Add any additional scripts here -->
 <span class="fw-bolder"></span>
 <script>
-  
+
+  async function obtenerNombreReferidor(idReferidor) {
+    const url = `/getuser?userID=${idReferidor}`;
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'}
+      });
+
+      const data = await response.json();
+
+      if (data.code === 200) {
+        return data.user[0].nombreCompleto;
+      } else {
+        // Manejar el caso en que el código no sea 200 (por ejemplo, mostrar un mensaje de error)
+        throw new Error("Usuario no encontrado en la base de datos");
+      }
+    } catch (error) {
+      // Manejar errores de la solicitud (por ejemplo, mostrar un mensaje de error)
+      throw new Error('Error al realizar la solicitud: ' + error.message);
+    }
+  }
+
+
+  var nombreReferidorGlobal;
   const enviar = document.querySelector("#enviar");
   const loadingModal = new bootstrap.Modal(document.getElementById('exampleModal'));
 
@@ -156,28 +181,25 @@
     }
    
     spinner.style.display = "block"; 
-   loadingModal.show();
+    loadingModal.show();
 
     const url = `/getuser?userID=${idReferidor}`;
+    
     // Realizar la solicitud GET usando fetch
     fetch(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-        // Puedes agregar más encabezados según sea necesario
-        },
+      headers: {'Content-Type': 'application/json'}
       })
       .then(response => response.json()) // Parsear la respuesta como JSON
       .then(data => {
-        console.log(data)
+        nombreReferidor = data.user[0].nombreCompleto;
         if (data.code == 200) {
-            registro.innerHTML = `<p> 
+            registro.innerHTML = `<p id="capturaNombre"> 
                                       Usuario Referidor Encontrado: <span class="fw-bolder"> ${data.user[0].nombreCompleto} </span>
                                   </p>
                                   <br>
                                   <button type="button" class="btn btn-warning form-control" data-bs-dismiss="modal">Registarme</button>`;
             spinner.style.display = "none";
-            
         } else {
           loadingModal.hide();
             Swal.fire({
@@ -196,23 +218,25 @@
 
   });
 
-
-</script>
-
-<script>
     const registro = document.querySelector("#registro");
 
-    registro.addEventListener("click", () => {
+    registro.addEventListener("click", async () => {
+
       const nombreCompleto = document.getElementById('nombreCompleto').value;
       const paisResidencia = document.getElementById('paisResidencia').value;
       const numeroDocumento = document.getElementById('numeroDocumento').value;
       const numeroContacto = document.getElementById('numeroContacto').value;
       const correoElectronico = document.getElementById('correoElectronico').value;
       const fechaNacimiento = document.getElementById('fechaNacimiento').value;
-      const nombreReferidor = document.getElementById('nombreReferidor').value;
-      const pasosCumplidos = document.getElementById('pasosCumplidos').checked;
+      const pasosCumplidos1 = document.getElementById('pasosCumplidos1').checked;
+      const pasosCumplidos2 = document.getElementById('pasosCumplidos2').checked;
+      const pasosCumplidos3 = document.getElementById('pasosCumplidos3').checked;
+      const pasosCumplidos4 = document.getElementById('pasosCumplidos4').checked;
       const idReferidor = document.querySelector("#idReferidor").value;
       const spinner = document.querySelector("#spinner");
+      const nombreReferidor = await obtenerNombreReferidor(idReferidor);
+
+      debugger;
 
       const jsonData = {
         nombreCompleto,
@@ -222,7 +246,7 @@
         correoElectronico,
         fechaNacimiento,
         nombreReferidor,
-        pasosCumplidos,
+        pasosCumplidos: pasosCumplidos1,
         idReferidor
         };
 
