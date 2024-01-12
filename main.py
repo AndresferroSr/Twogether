@@ -92,6 +92,16 @@ def calcular_edad(fecha_nacimiento):
         raise ValueError("La persona es menor de edad.")
     return edad
 
+def validar_longitud_celular(phone_number, country):
+    # Obtener el código de país
+    country_length = query.LENGTH_COUNTRIES.get(country, '')
+    # Verificar si el número ya tiene el código de país
+
+    if len(phone_number) == country_length:
+        return phone_number
+    else:
+        raise ValueError("Longitud de numero de celular incorrecta segun tu pais, por favor, revisa")
+
 @app.route('/getuser', methods = ["GET", "POST"])
 def get_user():
     user_id = request.args.get('userID')
@@ -116,6 +126,9 @@ def front():
             # dict_form = request.form.to_dict()
             dict_form = json.loads(request.data)
             dict_form["pasosCumplidos"] = str(dict_form["pasosCumplidos"])
+
+            validar_longitud_celular(dict_form['numeroContacto'],  dict_form['paisResidencia'])
+
             dict_form['numeroContacto'] = transform_phone_number(dict_form['numeroContacto'], dict_form['paisResidencia'])
             
             calcular_edad(dict_form["fechaNacimiento"])

@@ -21,16 +21,66 @@
           <div class="mb-3">
               <label for="paisResidencia" class="form-label">✅ País de residencia:</label>
               <select class="form-select" id="paisResidencia" name="paisResidencia" required>
+              <optgroup label="Principales">
                   <option value="CO">Colombia</option>
-                  <option value="EEUU">EEUU</option>
-                  <option value="Mexico">Mexico</option>
-                  <option value="España">España</option>
-                  <option value="Alemania">Alemania</option>
                   <option value="Canada">Canada</option>
-                  <option value="Francia">Francia</option>
-                  <option value="Brasil">Brasil</option>
-                  <option value="Italia">Italia</option>
-                  <option value="Belgica">Bélgica</option>
+                  <option value="EEUU">EEUU</option>
+                  <option value="España">España</option>
+                  <option value="Mexico">Mexico</option>
+              </optgroup>
+              <optgroup label="Todos los Paises">
+                <option value="Alemania">Alemania</option>
+                <option value="Australia">Australia</option>
+                <option value="Austria">Austria</option>
+                <option value="Bélgica">Bélgica</option>
+                <option value="Brasil">Brasil</option>
+                <option value="Bulgaria">Bulgaria</option>
+                <option value="Canada">Canada</option>
+                <option value="Chipre">Chipre</option>
+                <option value="CO">Colombia</option>
+                <option value="Croacia">Croacia</option>
+                <option value="Dinamarca">Dinamarca</option>
+                <option value="EEUU">EEUU</option>
+                <option value="Ecuador">Ecuador</option>
+                <option value="Eslovaquia">Eslovaquia</option>
+                <option value="Eslovenia">Eslovenia</option>
+                <option value="España">España</option>
+                <option value="Estonia">Estonia</option>
+                <option value="Finlandia">Finlandia</option>
+                <option value="Francia">Francia</option>
+                <option value="Grecia">Grecia</option>
+                <option value="Hong Kong">Hong Kong</option>
+                <option value="Hungria">Hungría</option>
+                <option value="India">India</option>
+                <option value="Indonesia">Indonesia</option>
+                <option value="Irlanda">Irlanda</option>
+                <option value="Italia">Italia</option>
+                <option value="Japan">Japan</option>
+                <option value="Kazakhstan">Kazakhstan</option>
+                <option value="Kyrgyzstan">Kyrgyzstan</option>
+                <option value="Letonia">Letonia</option>
+                <option value="Lituania">Lituania</option>
+                <option value="Luxemburgo">Luxemburgo</option>
+                <option value="Malaysia">Malaysia</option>
+                <option value="Malta">Malta</option>
+                <option value="Mexico">Mexico</option>
+                <option value="Mongolia">Mongolia</option>
+                <option value="Nueva Zelanda">New Zealand</option>
+                <option value="Paises Bajos">Países Bajos</option>
+                <option value="Peru">Peru</option>
+                <option value="Philippines">Philippines</option>
+                <option value="Polonia">Polonia</option>
+                <option value="Portugal">Portugal</option>
+                <option value="Rumania">Rumania</option>
+                <option value="Russia">Russia</option>
+                <option value="Singapore">Singapore</option>
+                <option value="Suecia">Suecia</option>
+                <option value="Taiwan">Taiwan</option>
+                <option value="Thailand">Thailand</option>
+                <option value="Turkey">Turkey</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="Uzbekistan">Uzbekistan</option>
+              </optgroup>
                   <!-- Puedes agregar más opciones de países según sea necesario -->
               </select>
           </div>
@@ -192,8 +242,8 @@
       })
       .then(response => response.json()) // Parsear la respuesta como JSON
       .then(data => {
-        nombreReferidor = data.user[0].nombreCompleto;
         if (data.code == 200) {
+          //nombreReferidor = data.user[0].nombreCompleto;
             registro.innerHTML = `<p id="capturaNombre"> 
                                       Usuario Referidor Encontrado: <span class="fw-bolder"> ${data.user[0].nombreCompleto} </span>
                                   </p>
@@ -235,8 +285,6 @@
       const idReferidor = document.querySelector("#idReferidor").value;
       const spinner = document.querySelector("#spinner");
       const nombreReferidor = await obtenerNombreReferidor(idReferidor);
-
-      debugger;
 
       const jsonData = {
         nombreCompleto,
