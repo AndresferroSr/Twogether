@@ -16,53 +16,7 @@ import settings
 
 app = Flask(__name__)
 
-FILE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQixwgy_oJiSYDHhcESEAoIOKN5KXCFEPO6LBCMAnkaYQh8X0EqJWrIv7vi7uceqaYPGfEkHx_acsey/pub?output=csv"
-
-meses = {
-    'enero': 1, 'febrero': 2, 'marzo': 3, 'abril': 4,
-    'mayo': 5, 'junio': 6, 'julio': 7, 'agosto': 8,
-    'septiembre': 9, 'octubre': 10, 'noviembre': 11, 'diciembre': 12
-}
-
 port = int(os.environ.get("PORT", 8080))
-
-
-def read_bad_excel(path):
-    gc = gspread.service_account("keys.json")  
-    df = pd.read_csv(path, header=None)
-    df.columns = df.iloc[1]
-    df = df[2:]
-    df.reset_index(drop=True, inplace=True)
-    
-    df["hora_convertida"] = pd.to_datetime(df["HORA_DE_REGISTRO"], format='%I:%M %p').dt.time
-    df["dia"] = df["FECHAREGISTRO"].str.split(" ")[0][0]
-    df["mes"] = df["FECHAREGISTRO"].str.split(" ")[0][1].replace(",", "")
-    df["year"] = df["FECHAREGISTRO"].str.split(" ")[0][2]
-
-    df['fecha_hora'] = pd.to_datetime(
-        df['year'].astype(str) + '-' +
-        df['mes'].map(meses).astype(str) + '-' +
-        df['dia'].astype(str) + ' ' +
-        df['hora_convertida'].astype(str)
-    )
-    return df
-
-
-@app.route('/hook', methods=['GET'])
-def hook_data():
-    frame = read_bad_excel(FILE)
-    frame_corregido = sqldf(query.CORRECION_LLENADO)
-    frame_contactos = sqldf(query.CONTACTOS)
-    jsondata = frame_contactos.to_dict(orient = "records")
-
-    for i in range(0, len(jsondata)):
-        response = requests.post('https://hook.us1.make.com/di6tg4ufk8hx9s2tc977tlj7pinsua38', 
-                                json = frame_contactos.to_dict(orient = "records",)[i]
-        ) 
-        print({'status': response.status_code, 'message': response.text})
-    return jsonify({'status': response.status_code,
-                    'message': response.text})
-
 
 class DatosFormulario(BaseModel):
     nombreCompleto: constr(strip_whitespace=True, min_length=1)
@@ -83,7 +37,7 @@ def transform_phone_number(phone_number, country):
     else:
         return f'{country_code}{phone_number}'
 
-def calcular_edad(fecha_nacimiento):
+def validar_calcular_edad(fecha_nacimiento):
     # Convertir la cadena de fecha a un objeto datetime
     fecha_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d')
     fecha_actual = datetime.now()
@@ -125,13 +79,16 @@ def front():
         try:
             # dict_form = request.form.to_dict()
             dict_form = json.loads(request.data)
+
+            valid_compra = settings.client.query(query.QUERY_COMPRA).to_dataframe()
+            
             dict_form["pasosCumplidos"] = str(dict_form["pasosCumplidos"])
 
             validar_longitud_celular(dict_form['numeroContacto'],  dict_form['paisResidencia'])
 
             dict_form['numeroContacto'] = transform_phone_number(dict_form['numeroContacto'], dict_form['paisResidencia'])
             
-            calcular_edad(dict_form["fechaNacimiento"])
+            validar_calcular_edad(dict_form["fechaNacimiento"])
 
             datos_formulario = DatosFormulario(**dict_form)
             frame = pd.DataFrame(dict_form, index=[0])
@@ -181,6 +138,31 @@ def front():
                     """)
             requests.post('https://hook.us1.make.com/di6tg4ufk8hx9s2tc977tlj7pinsua38', json = frame_contactos_filtrado_serial)
 
+
+            frame_valid_compra = settings.client.query(query.QUERY_COMPRA).to_dataframe()
+
+            if dict_form["idReferidor"] in frame_valid_compra["idReferidor"].values:
+                
+                settings.client.query(f"""delete 
+                                          from towgether.web_page.form_web_disparador_compra 
+                                          where idReferidor = '{frame_valid_compra["idReferidor"].unique()[0]}' """)
+                
+                frame_valid_compra.to_gbq(destination_table = f'{settings.DATASET}.form_web_disparador_compra',
+                                            project_id = settings.PROJECT_ID,
+                                            credentials = settings.credentials,
+                                            if_exists = "append")
+                
+                serializador = [{
+                    'ID_REFERIDOR_COMPRA': frame_valid_compra["idReferidor"].unique()[0],
+                    'NOMBRE_REFERIDOR_COMPRA': frame_valid_compra["nombreReferidor"].unique()[0],
+                    'ID_REFERIDO_1': frame_valid_compra["numeroDocumento"].values[0],
+                    'NOMBRE_REFERIDO_1': frame_valid_compra["nombreCompleto"].values[0],
+                    'ID_REFERIDO_2': frame_valid_compra["numeroDocumento"].values[1],
+                    'NOMBRE_REFERIDO_2': frame_valid_compra["nombreCompleto"].values[1]
+                }]
+
+                print("Hacer la Peticion a servidor")
+                                
             return jsonify({'status': 'success', 
                             'code': 200,
                             'user': validators.correct_frame(frame_contactos_filtrado).to_dict(orient = "records"),
@@ -189,6 +171,7 @@ def front():
             return jsonify({'status': 'error', 'message': 
                             f'Error en los datos del formulario: {str(e)}',
                             'code': 400})
+        
     return render_template('index.html')
 
 

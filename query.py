@@ -155,3 +155,50 @@ LENGTH_COUNTRIES  = {
     'Peru': 10,
     'Chile': 8
 }
+
+
+QUERY_COMPRA = '''
+
+
+
+with test as 
+(
+SELECT 
+    nombreReferidor, idReferidor, count(*) as cuenta 
+FROM `towgether.web_page.form_web_llenado`
+group by 1,2
+having cuenta > 1
+),
+
+interm as (
+    select test.*, pa.numeroDocumento, pa.nombreCompleto
+from test
+inner join `towgether.web_page.form_web_llenado` pa
+on test.idReferidor = pa.idReferidor
+),
+
+validos as (
+select 
+    interm.nombreReferidor,
+    interm.idReferidor,
+    interm.cuenta,
+    interm.numeroDocumento,
+    interm.nombreCompleto,
+    tt.cuenta as valid
+from interm
+left join test tt
+on interm.numeroDocumento = tt.idReferidor
+)
+
+select 
+    idReferidor, 
+    nombreReferidor, 
+    numeroDocumento, 
+    nombreCompleto, sum(valid) as valid
+from validos
+group by 1,2,3,4
+having valid = 2
+and idReferidor not in (select distinct idReferidor from towgether.web_page.form_web_disparador_compra)
+
+
+'''
