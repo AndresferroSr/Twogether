@@ -115,9 +115,8 @@ def front():
             frame_contactos_filtrado_serial = validators.correct_frame(frame_contactos_filtrado).to_dict(orient = "records")
             frame_contactos_filtrado_serial_valid = frame_contactos_filtrado_serial[0]
             
-            if frame_contactos_filtrado_serial_valid.get('numeroDocumento').startswith("LC"):
-                frame_contactos_filtrado_serial["referidosPorReferidor"] = 0
-                frame_contactos_filtrado_serial["registroConMismoId"] = 0
+            if frame_contactos_filtrado_serial_valid.get('idReferidor').startswith("LC"):
+                breakpoint()                
                 pass # como es lider de comunidad, no deben correr las validaciones
             else:
                 if int(frame_contactos_filtrado_serial_valid.get("referidosPorReferidor")) > 2:
@@ -161,8 +160,8 @@ def front():
                     'NOMBRE_REFERIDO_2': frame_valid_compra["nombreCompleto"].values[1]
                 }]
 
-                print("Hacer la Peticion a servidor")
-                                
+                requests.post('https://hook.us1.make.com/edj6um9jg5fwmhhojl0ii1hlukqqqeip', json = serializador)
+            
             return jsonify({'status': 'success', 
                             'code': 200,
                             'user': validators.correct_frame(frame_contactos_filtrado).to_dict(orient = "records"),

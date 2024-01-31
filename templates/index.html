@@ -85,12 +85,12 @@
               </select>
           </div>
           <div class="mb-3">
-              <label for="numeroDocumento" class="form-label">✅ Número del Documento de Identificación:</label>
+              <label for="numeroDocumento" class="form-label">✅ Número del Documento de Identificación: (Sin Espacios Ni Guiones)</label>
               <input type="text" class="form-control" id="numeroDocumento" name="numeroDocumento" placeholder="Cédula, DNI, ID, driver licence" required>
           </div>
           <div class="mb-3">
               <label for="numeroContacto" class="form-label">✅ Número contacto:</label>
-              <input type="text" class="form-control" id="numeroContacto" name="numeroContacto" placeholder="Sin indicativo de país, preferiblemente con WhatsApp" required>
+              <input type="text" class="form-control" id="numeroContacto" name="numeroContacto" placeholder="Sin indicativo de país" required>
           </div>
           <div class="mb-3">
               <label for="correoElectronico" class="form-label">✅ Correo electrónico:</label>
@@ -102,7 +102,7 @@
           </div>
           <div class="mb-3">
               <label for="idReferidor" class="form-label">✅ Escribe el ID Twogether de quien te invitó:</label>
-              <input type="text" class="form-control" id="idReferidor" name="idReferidor" placeholder="Recuerda revisar el mensaje de invitación" required>
+              <input type="text" class="form-control" id="idReferidor" name="idReferidor" placeholder="Pídeselo a esa persona" required>
           </div>
           <div>
             <p>FELICITACIONES, Si has llegado hasta este punto es por que has tomado la decisión de ganar dinero por tus compras, marca las casillas recordando los pasos que vas a cumplir: </p>
@@ -127,7 +127,7 @@
           
            <!-- Modal -->
            <div class="modal fade text-dark" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
               <div class="modal-content">
                 <div class="modal-header">
                   <h5 class="modal-title" id="exampleModalLabel">Validaciones Twogether</h5>
@@ -271,7 +271,25 @@
     const registro = document.querySelector("#registro");
 
     registro.addEventListener("click", async () => {
-
+      Swal.fire({
+        title: "Gracias por intentar registrarte",
+        html: "Estamos haciendo nuestras ultimas validaciones, por favor espera un momento",
+        timer: 100000,
+        timerProgressBar: true,
+        didOpen: () => {
+          Swal.showLoading();
+          const timerInterval = setInterval(() => {
+            Swal.getContent().querySelector("b").textContent = `${Swal.getTimerLeft()}`;
+          }, 100);
+        },
+        willClose: () => {
+          clearInterval(timerInterval);
+        }
+      }).then((result) => {
+        if (result.dismiss === Swal.DismissReason.timer) {
+          console.log("Se cerró automáticamente por el temporizador");
+        }
+      });
       const nombreCompleto = document.getElementById('nombreCompleto').value;
       const paisResidencia = document.getElementById('paisResidencia').value;
       const numeroDocumento = document.getElementById('numeroDocumento').value;
