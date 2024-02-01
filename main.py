@@ -115,8 +115,7 @@ def front():
             frame_contactos_filtrado_serial = validators.correct_frame(frame_contactos_filtrado).to_dict(orient = "records")
             frame_contactos_filtrado_serial_valid = frame_contactos_filtrado_serial[0]
             
-            if frame_contactos_filtrado_serial_valid.get('idReferidor').startswith("LC"):
-                breakpoint()                
+            if frame_contactos_filtrado_serial_valid.get('idReferidor').startswith("LC"):             
                 pass # como es lider de comunidad, no deben correr las validaciones
             else:
                 if int(frame_contactos_filtrado_serial_valid.get("referidosPorReferidor")) > 2:
